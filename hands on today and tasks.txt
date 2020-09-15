@@ -1,0 +1,332 @@
+//hands on 
+
+package com.myboot.bootapi;
+
+
+
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class MyRestApi {
+
+
+@RequestMapping(value="test")
+public String hello(){
+
+return "Hello World";
+}
+
+@GetMapping(value="student")
+public Student getStudent() {
+Student student=new Student(10,"DHONI");
+return student;
+}
+
+@GetMapping(value="student/{name}")
+public Student getStudentName(@PathVariable String name){
+Student student=new Student(10,name);
+return student;
+}
+
+
+@PostMapping(value="studentdata")
+public String postStudent(@RequestBody Student student)
+{
+System.out.println(student);
+return "Data accepted";
+}
+
+
+@DeleteMapping(value="studentdata")
+public String deleteStudent(@RequestBody String name)
+{
+System.out.println(name);
+return "delete requested";
+}
+
+
+@PutMapping(value="studentdata")
+public String putStudent()
+
+{
+return "putrequested";
+}
+
+
+
+
+
+}
+
+
+
+//b
+
+
+package com.myboot.bootapi;
+
+
+
+public class Student {
+
+int studentId;
+String studentName;
+public int getStudentId() {
+return studentId;
+}
+public void setStudentId(int studentId) {
+this.studentId = studentId;
+}
+public String getStudentName() {
+return studentName;
+}
+public void setStudentName(String studentName) {
+this.studentName = studentName;
+}
+public Student(int studentId, String studentName) {
+super();
+this.studentId = studentId;
+this.studentName = studentName;
+}
+@Override
+public String toString() {
+return "Student [studentId=" + studentId + ", studentName=" + studentName + "]";
+}
+public Student() {
+// TODO Auto-generated constructor stub
+}
+}
+
+
+package com.myboot.bootapi;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class BootApiApplication {
+
+public static void main(String[] args) {
+SpringApplication.run(BootApiApplication.class, args);
+
+System.out.println("Service is up ");
+}
+
+}
+
+
+
+
+
+
+
+
+
+2
+//mvc with springboot
+
+//homecontroller
+package com.myboot.mvc;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+public class HomeController {
+
+
+@RequestMapping(value="/test")
+public String home()
+{
+System.out.println("HOME METHOD");
+return "home";
+}
+
+
+//jsp
+
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+
+WELCOME TO MVC WITH BOOT
+
+</body>
+</html>
+
+//implement css task for the day
+
+body{
+backgroud color:blue
+}
+
+
+
+
+////task to insert and retrieve the details from the tabel
+
+//MyUsers
+package com.myboot.mvc1.model;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
+@Entity
+public class MyUsers {
+
+@Id
+String userName;
+String password;
+public String getUserName() {
+	return userName;
+}
+public void setUserName(String userName) {
+	this.userName = userName;
+}
+public String getPassword() {
+	return password;
+}
+public void setPassword(String password) {
+	this.password = password;
+}
+public MyUsers(String userName, String password) {
+	super();
+	this.userName = userName;
+	this.password = password;
+}
+public MyUsers() {
+	// TODO Auto-generated constructor stub
+}
+@Override
+public String toString() {
+	return "MyUsers [userName=" + userName + ", password=" + password + "]";
+}
+
+}
+
+
+//usersdao
+
+package com.myboot.mvc1.dao;
+import com.myboot.mvc1.model.MyUsers;
+
+import java.util.ArrayList;
+
+import javax.transaction.Transactional;
+
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.sql.ordering.antlr.Factory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+
+@Component
+@Transactional
+public class MyUsersDao {
+
+
+@Autowired
+SessionFactory sessionFactor;
+
+
+public String saveUser(MyUsers myUsers)
+{
+try
+{
+Session session=sessionFactor.getCurrentSession();
+session.save(myUsers);
+
+return "user created";
+}
+catch (Exception e) {
+// TODO: handle exception
+e.printStackTrace();
+}
+
+return "cannot create user";
+
+}
+public ArrayList<MyUsers> getValues(){
+	try {
+		Session session=sessionFactor.getCurrentSession();
+		Query query=session.createQuery("from MyUsers");
+		ArrayList<MyUsers> myusers=(ArrayList<MyUsers>)query.list();
+		return myusers;
+		}catch(Exception e) {
+		e.printStackTrace();
+	}
+	return null;
+	
+}
+}
+
+
+//home controller
+
+package com.myboot.mvc1;
+
+import java.util.ArrayList;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.myboot.mvc1.dao.MyUsersDao;
+import com.myboot.mvc1.model.MyUsers;
+
+@Controller
+public class HomeController {
+
+
+@Autowired
+MyUsersDao dao;
+
+@RequestMapping(value="/test")
+public String home()
+{
+dao.saveUser(new MyUsers("test","pass"));
+return "home";
+}
+
+@RequestMapping(value="/test1")
+public String home1(Model model)
+{
+ArrayList<MyUsers> myusers=dao.getValues();
+model.addAttribute("myusers", myusers);
+System.out.println(myusers);
+return "get";
+}
+
+
+
+
+
+
+}
+
+
+//jsp page
+
+<c:forEach items="${MyUsers}" var="user">
+${user.userName}
+${user.password}
+</c:forEach>
+
+
+
