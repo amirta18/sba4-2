@@ -1,4 +1,4 @@
-package com.asses.user.demo.model;
+adding - package com.asses.user.demo.model;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
